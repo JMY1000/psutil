@@ -104,17 +104,29 @@ if LINUX:
     from ._pslinux import IOPRIO_CLASS_RT  # NOQA
     # Linux >= 2.6.36
     if _psplatform.HAS_PRLIMIT:
+        # noinspection PyUnresolvedReferences
         from ._psutil_linux import RLIM_INFINITY  # NOQA
+        # noinspection PyUnresolvedReferences
         from ._psutil_linux import RLIMIT_AS  # NOQA
+        # noinspection PyUnresolvedReferences
         from ._psutil_linux import RLIMIT_CORE  # NOQA
+        # noinspection PyUnresolvedReferences
         from ._psutil_linux import RLIMIT_CPU  # NOQA
+        # noinspection PyUnresolvedReferences
         from ._psutil_linux import RLIMIT_DATA  # NOQA
+        # noinspection PyUnresolvedReferences
         from ._psutil_linux import RLIMIT_FSIZE  # NOQA
+        # noinspection PyUnresolvedReferences
         from ._psutil_linux import RLIMIT_LOCKS  # NOQA
+        # noinspection PyUnresolvedReferences
         from ._psutil_linux import RLIMIT_MEMLOCK  # NOQA
+        # noinspection PyUnresolvedReferences
         from ._psutil_linux import RLIMIT_NOFILE  # NOQA
+        # noinspection PyUnresolvedReferences
         from ._psutil_linux import RLIMIT_NPROC  # NOQA
+        # noinspection PyUnresolvedReferences
         from ._psutil_linux import RLIMIT_RSS  # NOQA
+        # noinspection PyUnresolvedReferences
         from ._psutil_linux import RLIMIT_STACK  # NOQA
         # Kinda ugly but considerably faster than using hasattr() and
         # setattr() against the module object (we are at import time:
@@ -143,11 +155,17 @@ if LINUX:
 
 elif WINDOWS:
     from . import _pswindows as _psplatform
+    # noinspection PyUnresolvedReferences
     from ._psutil_windows import ABOVE_NORMAL_PRIORITY_CLASS  # NOQA
+    # noinspection PyUnresolvedReferences
     from ._psutil_windows import BELOW_NORMAL_PRIORITY_CLASS  # NOQA
+    # noinspection PyUnresolvedReferences
     from ._psutil_windows import HIGH_PRIORITY_CLASS  # NOQA
+    # noinspection PyUnresolvedReferences
     from ._psutil_windows import IDLE_PRIORITY_CLASS  # NOQA
+    # noinspection PyUnresolvedReferences
     from ._psutil_windows import NORMAL_PRIORITY_CLASS  # NOQA
+    # noinspection PyUnresolvedReferences
     from ._psutil_windows import REALTIME_PRIORITY_CLASS  # NOQA
     from ._pswindows import CONN_DELETE_TCB  # NOQA
 
