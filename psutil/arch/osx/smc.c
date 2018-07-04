@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <IOKit/IOKitLib.h>
+#include <math.h>
 
 #include "smc.h"
+
+io_connect_t conn = NULL;
 
 UInt32 _strtoul(char *str, int size, int base)
 {
@@ -153,16 +156,35 @@ kern_return_t SMCReadKey(io_connect_t conn, UInt32Char_t key, SMCVal_t *val) {
     return kIOReturnSuccess;
 }
 
+/**
+ *
+ * @return True if suceeded, else false.
+ */
+static bool open_conn() {
+    if (conn == NULL) {
+        if (SMCOpen(&conn) != kIOReturnSuccess) {
+            // We'll pass for this read, but can be tried again later
+            SMCClose(&conn);
+            conn = NULL;
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
 
+/**
+ *
+ * @param key
+ * @return A double corresponding to the temperature in degrees Celcius, or NAN if the read failed.
+ */
 double SMCGetTemperature(char *key) {
-    io_connect_t conn;
     SMCVal_t val;
     kern_return_t result;
     int intValue;
 
-    result = SMCOpen(&conn);
-    if (result != kIOReturnSuccess) {
-        return 0.0;
+    if (!open_conn()) {
+        return NAN;
     }
 
     result = SMCReadKey(conn, key, &val);
@@ -172,36 +194,34 @@ double SMCGetTemperature(char *key) {
             if (strcmp(val.dataType, DATATYPE_SP78) == 0) {
                 // convert sp78 value to temperature
                 intValue = val.bytes[0] * 256 + (unsigned char)val.bytes[1];
-                SMCClose(conn);
                 return intValue / 256.0;
             }
         }
     }
     // read failed
-    SMCClose(conn);
-    return 0.0;
+    return NAN;
 }
 
-
+/**
+ *
+ * @param fanNum
+ * @return A double corresponding to the fan speed in RPM, or NAN if the read failed.
+ */
 float SMCGetFanSpeed(int fanNum)
 {
     SMCVal_t val;
     kern_return_t result;
     UInt32Char_t  key;
-    io_connect_t conn;
 
-    result = SMCOpen(&conn);
-    if (result != kIOReturnSuccess) {
-        return -1;
+    if (!open_conn()) {
+        return NAN;
     }
 
     sprintf(key, SMC_KEY_FAN_SPEED, fanNum);
     result = SMCReadKey(conn, key, &val);
      if (result != kIOReturnSuccess) {
-        SMCClose(conn);
-        return -1;
+        return NAN;
     }
-    SMCClose(conn);
     return _strtof((unsigned char *)val.bytes, val.dataSize, 2);
 }
 
@@ -211,16 +231,38 @@ int SMCGetFanNumber(char *key)
     kern_return_t result;
     io_connect_t conn;
 
-    result = SMCOpen(&conn);
-    if (result != kIOReturnSuccess) {
-        return 0;
+    if (!open_conn()) {
+        return NAN;
     }
 
     result = SMCReadKey(conn, key, &val);
      if (result != kIOReturnSuccess) {
-        SMCClose(conn);
-        return 0;
+        return NAN;
     }
-    SMCClose(conn);
     return _strtoul((char *)val.bytes, val.dataSize, 10);
+}
+
+int count_cpu_cores() {
+    // TODO
+    return 1;
+}
+int count_physical_cpus() {
+    // TODO
+    return 1;
+}
+int count_gpus() {
+    // TODO
+    return 1;
+}
+int count_dimms() {
+    // TODO
+    return 2;
+}
+bool temperature_reasonable(double d) {
+    // TODO
+    return d != NAN;
+}
+bool fan_speed_reasonable(double d) {
+    // TODO
+    return d != NAN;
 }
